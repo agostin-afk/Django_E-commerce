@@ -1,15 +1,24 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+from django.contrib.messages import constants
+
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / 'data' / 'web'
+DOTENV_FILE = BASE_DIR / "dotenv_files" / ".env"
+load_dotenv(DOTENV_FILE)
+
+SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
 
 
-SECRET_KEY = 'django-insecure-@w(o3rq72^$)^pa8n2=b#9$w63b5=)vusig93ex+rc9eowl_y#'
 
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
 
 
 # Application definition
@@ -26,6 +35,9 @@ INSTALLED_APPS = [
     'pedido',
     'produto',
     'perfil',
+    
+    #ferramentas
+    'debug_toolbar', 
 ]
 
 MIDDLEWARE = [
@@ -36,6 +48,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'loja.urls'
@@ -99,5 +113,32 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+MESSAGES_TAGS = {
+    constants.DEBUG: 'alert-info',
+    constants.ERROR: 'alert-danger',
+    constants.INFO: 'alert-info',
+    constants.SUCCESS: 'alert-success',
+    constants.WARNING: 'alert-warning',
+}
+
+INTERNAL_IPS =[
+    '127.0.0.1',
+]
+
+SESSION_COOKIE_AGE = 60 * 60 * 24 *7
+SESSION_SAVE_EVERY_REQUEST = False
+
+
+STATIC_URL = 'static/'
+
+STATIC_ROOT =  DATA_DIR / 'tamplates/static/'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = DATA_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
