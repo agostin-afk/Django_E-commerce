@@ -5,10 +5,10 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
-    path('produto/', include('produto.urls')),
+    path('admin/', admin.site.urls),
     path('perfil/', include('perfil.urls')),
     path('pedido/', include('pedido.urls')),
-    path('admin/', admin.site.urls),
+    path('', include('produto.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_URL)
 if settings.DEBUG:
     import debug_toolbar
