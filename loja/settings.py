@@ -133,12 +133,16 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 *7
 SESSION_SAVE_EVERY_REQUEST = False
 
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_DIRS = [
+    BASE_DIR /'templates/static',
+]
 
-STATIC_ROOT =  DATA_DIR / 'tamplates/static/'
-
+MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = DATA_DIR / 'media'
+
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

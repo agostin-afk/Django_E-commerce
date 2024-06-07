@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+    {% include "partials/_head.html" %}
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-primary navbar-expand-lg">
+        {% include "partials/_nav.html" %}
+    </nav>
+
+    <main class="container mt-4 mb-4">
+        {% block conteudo %}{% endblock conteudo %}
+    </main>
+
+    <footer class="container-fluid bg-primary">
+        {% include "partials/_footer.html" %}
+    
+</body>
+
+</html>
