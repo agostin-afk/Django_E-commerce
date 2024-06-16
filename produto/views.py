@@ -1,4 +1,5 @@
 from typing import Any
+from loja.settings import DEBUG
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse
@@ -58,12 +59,10 @@ class AdicionarAoCarrinho(View):
             self.request.session['carrinho'] = {}
 
         carrinho = self.request.session['carrinho']
-        print(f"Carrinho antes de adicionar: {carrinho}")  # Linha de debug
 
         if variacao_id_str in carrinho:
             quantidade_carrinho = carrinho[variacao_id_str]['quantidade']
             quantidade_carrinho += 1
-            print(f"Quantidade no carrinho antes de atualizar: {quantidade_carrinho}")  # Linha de debug
 
             if variacao_estoque < quantidade_carrinho:
                 messages.warning(
@@ -72,9 +71,11 @@ class AdicionarAoCarrinho(View):
                     f'produto "{produto_nome}". Adicionamos {variacao_estoque}x '
                     f'no seu carrinho.'
                 )
-                quantidade_carrinho = variacao_estoque
+                if not DEBUG:
+                     quantidade_carrinho = variacao_estoque
 
             carrinho[variacao_id_str]['quantidade'] = quantidade_carrinho
+            
             carrinho[variacao_id_str]['preco_quantitativo'] = preco_unitario * quantidade_carrinho
             carrinho[variacao_id_str]['preco_quantitativo_promocional'] = preco_unitario_promocional * quantidade_carrinho
         else:
@@ -92,19 +93,17 @@ class AdicionarAoCarrinho(View):
                 # 'imagem': imagem,
             }
 
-        # Certifique-se de que o carrinho atualizado seja salvo na sessão
         self.request.session['carrinho'] = carrinho
-        self.request.session.modified = True  # Marcar a sessão como modificada
-        # self.request.session.save()  # Removido
+        self.request.session.modified = True 
+        self.request.session.save()  # Removido
 
-        print(f"Carrinho depois de adicionar: {carrinho}")  # Linha de debug
 
         messages.success(
             self.request,
             f'Produto {produto_nome} {variacao_nome} adicionado ao seu '
             f'carrinho {carrinho[variacao_id_str]["quantidade"]}x.'
         )
-        pprint(carrinho)
+        # pprint(carrinho)
         return HttpResponse(f'variacao: {variacao.nome}')
 
 class RemoverDoCarrinho(View):
