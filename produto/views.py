@@ -31,9 +31,7 @@ class AdicionarAoCarrinho(View):
         #     self.request.session.save()
         http_referer = self.request.META.get('HTTP_REFERER', reverse('produto:ListarProdutos'))
         variacao_id = self.request.POST.get('vid')
-        variacao_id_str = str(variacao_id)  # Convertendo variacao_id para string para usar como chave no dicionário
-        print(f"Variacao ID recebido: {variacao_id_str}")  # Linha de debug
-        
+        variacao_id_str = str(variacao_id)
         if not variacao_id:
             messages.error(self.request, 'Produto não encontrado')
             return redirect(http_referer)
@@ -49,7 +47,7 @@ class AdicionarAoCarrinho(View):
         preco_unitario_promocional = variacao.preco_promocional
         quantidade = 1
         slug = produto.slug
-        # imagem = produto.imagem
+        imagem = produto.imagem
 
         if variacao_estoque < 1:
             messages.error(self.request, 'Estoque insuficiente')
@@ -90,7 +88,7 @@ class AdicionarAoCarrinho(View):
                 'preco_quantitativo_promocional': preco_unitario_promocional,
                 'quantidade': 1,
                 'slug': slug,
-                # 'imagem': imagem,
+                'imagem': imagem,
             }
 
         self.request.session['carrinho'] = carrinho
@@ -107,12 +105,50 @@ class AdicionarAoCarrinho(View):
         return HttpResponse(f'variacao: {variacao.nome}')
 
 class RemoverDoCarrinho(View):
-    pass
-
-
+    def get(self, request, *args, **kwargs):
+        http_referer = self.request.META.get('HTTP_REFERER', reverse('produto:ListarProdutos'))
+        variacao_id = self.request.GET.get('vid')  # Mudando de POST para GET
+        variacao_id_str = str(variacao_id)
+        
+        # print(f"HTTP_REFERER: {http_referer}")
+        # print(f"Variacao ID: {variacao_id}")
+        # print(f"Variacao ID str: {variacao_id_str}")
+        
+        if not variacao_id_str:
+            messages.error(self.request, 'Produto não encontrado')
+            # print("Produto não encontrado: variacao_id_str está vazio")
+            return redirect(http_referer)
+        
+        if not self.request.session.get('carrinho'):
+            # print("Carrinho não encontrado na sessão")
+            return redirect(http_referer)
+        
+        if variacao_id_str not in self.request.session['carrinho']:
+            # print(f"Variacao ID {variacao_id_str} não está no carrinho")
+            return redirect(http_referer)
+        
+        carrinho = self.request.session['carrinho'][variacao_id_str]
+        # print(f"Produto a ser removido: {carrinho}")
+        
+        messages.success(
+            self.request,
+            f'Produto {carrinho["produto_nome"]}{carrinho["variacao_nome"]} '
+            'removido do carrinho'
+        )
+        
+        del self.request.session['carrinho'][variacao_id_str]
+        self.request.session.save()
+        
+        # print(f"Produto {variacao_id_str} removido do carrinho")
+        
+        return redirect(http_referer)
 
 class Carrinho(View):
-    pass
+    def get(self, request, *args, **kwargs):
+        contexto= {
+            'carrinho': self.request.session.get('carrinho',{})
+        }
+        return render(self.request, 'produto/carrinho.html', contexto)
 
 
 
