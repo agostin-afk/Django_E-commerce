@@ -40,14 +40,14 @@ class AdicionarAoCarrinho(View):
         variacao_estoque = variacao.estoque
         produto = variacao.produto
 
-        produto_id = produto.id # type: ignore
+        produto_id = produto.id  # type: ignore
         produto_nome = produto.nome
         variacao_nome = variacao.nome or ''
         preco_unitario = variacao.preco
         preco_unitario_promocional = variacao.preco_promocional
         quantidade = 1
         slug = produto.slug
-        imagem = produto.imagem
+        imagem = produto.imagem.url if produto.imagem else ''
 
         if variacao_estoque < 1:
             messages.error(self.request, 'Estoque insuficiente')
@@ -93,8 +93,6 @@ class AdicionarAoCarrinho(View):
 
         self.request.session['carrinho'] = carrinho
         self.request.session.modified = True 
-        self.request.session.save()  # Removido
-
 
         messages.success(
             self.request,
@@ -103,7 +101,6 @@ class AdicionarAoCarrinho(View):
         )
         # pprint(carrinho)
         return HttpResponse(f'variacao: {variacao.nome}')
-
 class RemoverDoCarrinho(View):
     def get(self, request, *args, **kwargs):
         http_referer = self.request.META.get('HTTP_REFERER', reverse('produto:ListarProdutos'))
