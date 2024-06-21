@@ -33,7 +33,7 @@ class UserForm(forms.ModelForm):
         
         usuario_data = cleaned.get('username')
         password_data = cleaned.get('password')
-        password2_data = cleaned.get('password2')
+        password2_data = cleaned.get('password_confirm')
         email_data = cleaned.get('email')
         usuario_db = User.objects.filter(username = usuario_data).first()
         email_db = User.objects.filter(email = email_data).first()
@@ -42,6 +42,7 @@ class UserForm(forms.ModelForm):
         error_msg_email_exist = 'E-mail já cadastrado.'
         error_msg_password_match = 'As senhas precisam ser iguais.'
         error_msg_password_short = 'Senha muito curta.'
+        error_msg_required_field = 'Esse campo é obrigatório.'
         
         
         if self.usuario:
@@ -58,7 +59,21 @@ class UserForm(forms.ModelForm):
                 if len(password_data) < 6:
                     validation_errors_msgs['password'] = error_msg_password_short
         else:
-            validation_errors_msgs['username'] = 'Nome de usuario incorreto '
+            if usuario_db:
+                validation_errors_msgs['username'] = error_msg_user_exist
+            if email_db:
+                validation_errors_msgs['email'] = error_msg_email_exist
+            
+            if not password_data:
+                validation_errors_msgs['password'] = error_msg_required_field
+            
+            if not password2_data:
+                validation_errors_msgs['password2'] = error_msg_required_field
+            
+            if password_data != password2_data:
+                    validation_errors_msgs['password'] = error_msg_password_match
+            # if len(password_data) < 6:
+            #     validation_errors_msgs['password'] = error_msg_password_short
         
         if validation_errors_msgs:
             raise (forms.ValidationError(validation_errors_msgs))
