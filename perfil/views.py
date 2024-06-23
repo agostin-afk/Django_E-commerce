@@ -1,9 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 from django.views import View
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 import copy
 
 from . import models
@@ -94,15 +95,45 @@ class Criar(BasePerfil):
                 login(self.request, user= usuario)
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()
+        return redirect('perfil:CreateUser')
         return self.renderizar
 
 
 class Atualizar(View):
-    pass
+    def get(self, *args, **kwargs):
+        return HttpResponse('Atualizar')
 
 
 class Login(View):
-    pass
+    def post(self, *args, **kwargs):
+        username = self.request.POST.get('username')
+        password = self.request.POST.get('password')
+    
+        if not username or not password:
+            messages.error(
+                self.request,
+                'Usuário ou senha inválida',
+            )
+        usuario = authenticate(
+            self.request,
+            username=username,
+            password=password,
+        )
+        if not usuario:
+            messages.error(
+                self.request,
+                'Usuário ou senha inválidos'
+            )
+            return redirect('perfil:CreateUser')
+        login(self.request, user=usuario)
+        return redirect('produto:ListarProdutos')
 
 class Logout(View):
-    pass
+    def get(self, *args, **kwargs):
+        carrinho =  copy.deepcopy(self.request.session.get('carrinho)'))
+        
+        logout(self.request)
+        
+        self.request.session['carrinho'] = carrinho
+        self.request.session.save()
+        redirect('produto:ListarProdutos')
