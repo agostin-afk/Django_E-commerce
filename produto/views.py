@@ -8,6 +8,7 @@ from django.views.generic.detail import DetailView
 from django.views import View
 from django.http import HttpRequest, HttpResponse
 from .models import Produto, Variacao
+from perfil.models import Perfil
 from pprint import pprint
 
 class ListarProdutos(ListView):
@@ -153,6 +154,11 @@ class FinalizarCompra(View):
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('perfil:CreateUser')
+        # perfil = Perfil.objects.filter(usuario=self.request.user).exists()
+        # if not perfil:
+        #     return redirect('perfil:CreareUser')
+        # if not self.request.session.get('carrinho'):
+        #     return redirect('produto:ListarProdutos')
         contexto={
             'usuario': self.request.user,
             'carrinho': self.request.session['carrinho'],
