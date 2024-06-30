@@ -6,6 +6,7 @@ from produto.models import Produto
 class Pedido(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     total = models.FloatField()
+    qtd_total = models.PositiveIntegerField()
     status = models.CharField(
         default="C",
         max_length=1,
