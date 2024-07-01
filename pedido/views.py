@@ -26,7 +26,7 @@ class Pagar(View):
             return redirect('produto:ListarProdutos')
         carrinho = self.request.session.get('carrinho')
         carrinho_variacao_ids = [v for v in carrinho]
-        db_variacoes = list(Variacao.objects.select_related('produto').filter(id_in=carrinho_variacao_ids))
+        db_variacoes = list(Variacao.objects.select_related('produto').filter(id__in=carrinho_variacao_ids))
         for variacao in  db_variacoes:
             vid = str(variacao.id)
             estoque= variacao.estoque
@@ -81,7 +81,8 @@ class Pagar(View):
 
 
 class Lista(View):
-    pass
+    def get(self, *args, **kwargs):
+        return HttpResponse('Lista')
 
 class FecharPedido(View):
     pass
