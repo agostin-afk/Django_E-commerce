@@ -53,6 +53,17 @@ class Perfil(models.Model):
     
     def clean(self) -> None:
         error_messages = {}
+        
+        cpf_enviado = self.cpf or None
+        cpf_salvo = None
+        
+        perfil= Perfil.objects.filter(cpf=cpf_enviado).first()
+        if perfil:
+            cpf_salvo = perfil.cpf
+            
+            if cpf_salvo is not None and self.pk != perfil.pk:
+        
+                error_messages['cpf'] = "CPF já existe"
         if re.search(r'[^0-9]', self.cep) or len(self.cep) < 8:
             error_messages['cep'] = 'Cep inválido, insira os 8 digitos numericos'
         if error_messages:
