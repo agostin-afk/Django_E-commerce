@@ -1,4 +1,6 @@
 from typing import Any
+from django.db.models.query import QuerySet
+from django.db.models import Q
 from loja.settings import DEBUG
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -165,3 +167,18 @@ class FinalizarCompra(View):
             'carrinho': self.request.session['carrinho'],
         }
         return render(self.request, 'produto/resumo.html', contexto)
+    
+class Busca(ListarProdutos):
+    def get_queryset(self, *args, **kwargs):
+        termo =self.request.GET.get('termo') or self.request.session['termo']
+        qs = super().get_queryset(*args, **kwargs)
+        
+        if not termo:
+            return qs
+        qs = qs.filter(
+            Q(nome__icontains=termo) |
+            Q(descricao_curta__icontains=termo) |
+            Q(descricao_longa__icontains=termo)
+        )
+        self.request.session.save()
+        return qs
